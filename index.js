@@ -1,58 +1,71 @@
-const diceEl = document.querySelector('.dice');
-const btnRoll = document.querySelector('.btn--roll');
-const btnNew = document.querySelector('.btn--new');
-const btnHold = document.querySelector('.btn--hold');
+const dice = document.querySelector('.dice');
+const rollBtn = document.querySelector('.btn-roll');
+const newBtn = document.querySelector('.btn-new');
+const holdBtn = document.querySelector('.btn-hold');
 
-let currentScore = 0;
-let activePlayer = 0;
-let scores = [0, 0];
-let playing = true;
+let player1Score = 0;
+let player2Score = 0;
+let current = 0;
+let currentPlayer = 1;
+let gameActive = true;
 
-function switchPlayer() {
-  document.getElementById(`current--${activePlayer}`).textContent = 0;
-  currentScore = 0;
-  activePlayer = activePlayer === 0 ? 1 : 0;
+function switchTurn() {
+  document.getElementById(`current-${currentPlayer - 1}`).textContent = 0;
+  current = 0;
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
 }
 
-btnRoll.addEventListener('click', function () {
-  if (playing) {
-    const dice = Math.trunc(Math.random() * 6) + 1;
+rollBtn.addEventListener('click', function () {
+  if (!gameActive) return;
 
-    diceEl.src = `dice${dice}.jpg`;
-    diceEl.style.display = 'block';
+  const randomNum = Math.floor(Math.random() * 6) + 1;
+  dice.src = `dice${randomNum}.jpg`;
+  dice.style.display = 'block';
 
-    if (dice !== 1) {
-      currentScore += dice;
-      document.getElementById(`current--${activePlayer}`).textContent = currentScore;
-    } else {
-      switchPlayer();
-    }
+  if (randomNum !== 1) {
+    current += randomNum;
+    document.getElementById(`current-${currentPlayer - 1}`).textContent = current;
+  } else {
+    switchTurn();
   }
 });
 
-btnHold.addEventListener('click', function () {
-  if (playing) {
-    scores[activePlayer] += currentScore;
-    document.getElementById(`score--${activePlayer}`).textContent = scores[activePlayer];
+holdBtn.addEventListener('click', function () {
+  if (!gameActive) return;
 
-    if (scores[activePlayer] >= 100) {
-      playing = false;
-      diceEl.style.display = 'none';
-      alert(`Player ${activePlayer + 1} wins!`);
-    } else {
-      switchPlayer();
+  if (currentPlayer === 1) {
+    player1Score += current;
+    document.getElementById('score-0').textContent = player1Score;
+    if (player1Score >= 100) {
+      gameActive = false;
+      dice.style.display = 'none';
+      alert('Player 1 wins!');
+      return;
+    }
+  } else {
+    player2Score += current;
+    document.getElementById('score-1').textContent = player2Score;
+    if (player2Score >= 100) {
+      gameActive = false;
+      dice.style.display = 'none';
+      alert('Player 2 wins!');
+      return;
     }
   }
+
+  switchTurn();
 });
 
-btnNew.addEventListener('click', function () {
-  playing = true;
-  scores = [0, 0];
-  currentScore = 0;
-  activePlayer = 0;
-  diceEl.style.display = 'none';
-  document.getElementById('score--0').textContent = 0;
-  document.getElementById('score--1').textContent = 0;
-  document.getElementById('current--0').textContent = 0;
-  document.getElementById('current--1').textContent = 0;
+newBtn.addEventListener('click', function () {
+  gameActive = true;
+  player1Score = 0;
+  player2Score = 0;
+  current = 0;
+  currentPlayer = 1;
+  dice.style.display = 'none';
+
+  document.getElementById('score-0').textContent = 0;
+  document.getElementById('score-1').textContent = 0;
+  document.getElementById('current-0').textContent = 0;
+  document.getElementById('current-1').textContent = 0;
 });
